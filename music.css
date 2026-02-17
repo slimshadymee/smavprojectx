@@ -1,0 +1,288 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+@font-face {
+  font-family: 'YS Music';
+  src: url('fonts/yandexfonts/YandexSansText-Regular.woff') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'YS Music';
+  src: url('fonts/yandexfonts/YandexSansText-Bold.woff') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    list-style: none;
+    text-decoration: none;
+}
+
+body {
+    font-family: 'YS Music', sans-serif;
+    color: #fff;
+    background-color: #000;
+    height: 850vh;
+    user-select: none;
+}
+
+.navbar {
+    margin: 20px 0;
+}
+
+.container {
+    max-width: 620px;
+    margin: 0 auto;
+}
+
+.navbar__inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 10px;
+}
+
+.logo {
+    font-family: 'YS Music', sans-serif;
+    font-weight: 700;
+    font-size: 30px;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.navbar__settings_player_shuffle_off {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: #fff;
+    border-radius: 10px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.navbar__settings_player_shuffle_off img {
+    width: 25px;
+    height: 25px;
+}
+
+.content_inner {
+    display: flex;
+    flex-direction: column;
+}
+
+.content__music_inner {
+    margin-bottom: 120px;
+    position: relative;
+}
+
+.content__music_player_box {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100px;
+    display: none;
+    align-items: center;
+    padding: 0 10px;
+    background-color: rgba(255, 220, 98, 0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    touch-action: pinch-zoom;
+}
+
+.content__music_player {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 80px;
+    background-color: #FFDC62;
+    padding: 0 15px;
+    border-radius: 20px;
+}
+
+.show_music_player {
+    display: flex;
+}
+
+.content__music_player_progress {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    position: absolute;
+    background-color: transparent;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.content__music_player_progress_bar {
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.content__music_player_current_time {
+    position: absolute;
+    color: #151515;
+    font-size: 14px;
+    font-weight: 700;
+    padding-left: 10px;
+}
+
+.content__music_player_duration_time {
+    position: absolute;
+    right: 0;
+    color: #151515;
+    font-size: 14px;
+    font-weight: 700;
+    padding-right: 10px;
+}
+
+.content__music_player_cover {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-right: 20px;
+    z-index: 100;
+}
+
+.content__music_player_play_btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 50px; 
+    background-color: #000;
+    border-radius: 10px;
+    margin-left: 20px;
+    cursor: pointer;
+    flex-shrink: 0; /* Запретить сжатие кнопок */
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.content__music_player_play_icon {
+    width: 30px;
+    height: 30px;
+}
+
+.content__music_player_info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0; /* Важно для правильной работы text-overflow */
+    overflow: hidden; /* Скрываем выходящий за границы текст */
+    z-index: 100;
+}
+
+.content__music_player_trackname {
+    color: #000;
+    font-size: 18px;
+    font-weight: 700;
+    /* Добавляем обрезание текста для названия трека в плеере */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.content__music_player_artist {
+    color: #000;
+    font-size: 16px;
+    font-weight: 700;
+    /* Добавляем обрезание текста для названия трека в плеере */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.content__music_box {
+    width: 100%;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.content__music_box_plays {
+    background-color: #141414;
+    transition: all ease 0.4s;
+}
+
+.content__music_cover {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-right: 20px;
+    flex-shrink: 0; /* Не позволять обложке сжиматься */
+}
+
+.content__music_info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0; /* Важно для правильной работы text-overflow */
+    overflow: hidden; /* Скрываем выходящий за границы текст */
+}
+
+.content__music_trackname {
+    font-weight: 700;
+    color: #fff;
+    /* Обрезание текста с многоточием */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.content__music_artist {
+    font-size: 14px;
+    font-weight: 700;
+    color: #9E9E9E;
+    transition: color 0.3s ease;
+    /* Обрезание текста с многоточием */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.content__music_flacmark {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 30px;
+    border-radius: 5px;
+    border: 2px solid #FED42B;
+    margin-left: 30px;
+    flex-shrink: 0; /* Не позволять метке FLAC сжиматься */
+}
+
+.content__music_flacmark_icon {
+    font-size: 12px;
+    font-weight: 700;
+    color: #FED42B;
+}
+
+@media (max-width: 550px) {
+    
+}
+
