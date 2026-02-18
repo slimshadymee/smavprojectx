@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ZHANDEV SAVER</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --grad: linear-gradient(135deg, #833ab4 0%, #fd1d1d 55%, #fcb045 100%); }
+    body { min-height: 100vh; background: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #fff; display: flex; flex-direction: column; align-items: center; }
+    .hero { width: 100%; padding: 50px 20px 40px; text-align: center; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(131,58,180,.3) 0%, transparent 70%); }
+    .logo { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .logo-icon { width: 48px; height: 48px; border-radius: 13px; background: var(--grad); display: flex; align-items: center; justify-content: center; }
+    h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 800; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .tagline { color: #777; font-size: .95rem; margin-bottom: 28px; }
+
+    .cookie-banner { max-width: 640px; width: 100%; margin: 0 auto 18px; padding: 13px 16px; background: rgba(253,29,29,.1); border: 1px solid rgba(253,29,29,.3); border-radius: 12px; font-size: .86rem; color: #fb7185; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .cookie-banner.ok { background: rgba(56,239,125,.08); border-color: rgba(56,239,125,.25); color: #4ade80; }
+    .btn-setup { padding: 7px 14px; background: rgba(253,29,29,.2); border: 1px solid rgba(253,29,29,.35); color: #fb7185; border-radius: 8px; font-size: .8rem; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background .2s; }
+    .btn-setup:hover { background: rgba(253,29,29,.35); }
+    .cookie-banner.ok .btn-setup { background: rgba(56,239,125,.12); border-color: rgba(56,239,125,.3); color: #4ade80; }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.88); backdrop-filter: blur(6px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: #141414; border: 1px solid #2a2a2a; border-radius: 20px; padding: 30px; max-width: 560px; width: 100%; }
+    .modal h2 { font-size: 1.15rem; margin-bottom: 8px; }
+    .modal p { color: #888; font-size: .86rem; line-height: 1.6; margin-bottom: 14px; }
+    .steps-mini { list-style: none; margin-bottom: 18px; }
+    .steps-mini li { color: #999; font-size: .84rem; line-height: 1.8; padding-left: 22px; position: relative; }
+    .steps-mini li::before { content: attr(data-n); position: absolute; left: 0; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 800; }
+    .steps-mini li strong { color: #ddd; }
+    textarea { width: 100%; min-height: 85px; background: #0d0d0d; border: 1.5px solid #2e2e2e; border-radius: 11px; color: #fff; font-size: .8rem; padding: 11px 13px; resize: vertical; outline: none; font-family: monospace; line-height: 1.5; transition: border-color .2s; }
+    textarea:focus { border-color: #833ab4; }
+    textarea::placeholder { color: #444; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 13px; }
+    .btn-save { flex: 1; padding: 13px; background: var(--grad); color: #fff; border: none; border-radius: 11px; font-size: .93rem; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .btn-save:hover { opacity: .88; }
+    .btn-cancel { padding: 13px 18px; background: #1e1e1e; color: #888; border: 1px solid #2a2a2a; border-radius: 11px; font-size: .93rem; cursor: pointer; }
+    .btn-cancel:hover { background: #252525; }
+
+    .search-wrap { display: flex; gap: 10px; max-width: 640px; width: 100%; margin: 0 auto; }
+    input[type="text"] { flex: 1; padding: 15px 18px; background: #161616; border: 1.5px solid #2a2a2a; border-radius: 13px; color: #fff; font-size: .95rem; outline: none; transition: border-color .2s; }
+    input[type="text"]:focus { border-color: #833ab4; }
+    input[type="text"]::placeholder { color: #444; }
+    .btn-fetch { padding: 15px 26px; background: #fff; color: #000; border: none; border-radius: 13px; font-size: .95rem; font-weight: 700; cursor: pointer; white-space: nowrap; transition: opacity .2s, transform .1s; }
+    .btn-fetch:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-fetch:active { transform: translateY(0); }
+    .btn-fetch:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+    .status { max-width: 640px; width: 100%; margin: 14px auto 0; padding: 11px 16px; border-radius: 11px; font-size: .88rem; display: none; }
+    .status.loading { background: rgba(131,58,180,.15); color: #c084fc; display: block; }
+    .status.error { background: rgba(253,29,29,.12); color: #fb7185; display: block; }
+
+    .results { max-width: 900px; width: 100%; padding: 36px 20px 60px; display: none; }
+    .results.show { display: block; }
+    .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+    .results-title { font-size: 1rem; font-weight: 700; color: #ccc; }
+    .btn-dl-all { display: flex; align-items: center; gap: 7px; padding: 10px 20px; background: var(--grad); color: #fff; border: none; border-radius: 10px; font-size: .88rem; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .btn-dl-all:hover { opacity: .85; }
+
+    .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+    .media-card { background: #141414; border: 1px solid #222; border-radius: 15px; overflow: hidden; transition: transform .2s, border-color .2s; }
+    .media-card:hover { transform: translateY(-3px); border-color: #833ab4; }
+    .media-thumb { position: relative; aspect-ratio: 1; background: #0d0d0d; overflow: hidden; }
+    .media-thumb img, .media-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .media-badge { position: absolute; top: 9px; right: 9px; padding: 3px 9px; background: rgba(0,0,0,.7); border-radius: 20px; font-size: .72rem; font-weight: 700; color: #fff; backdrop-filter: blur(4px); }
+    .media-footer { padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .media-index { font-size: .82rem; color: #555; }
+    .btn-dl { display: flex; align-items: center; gap: 5px; padding: 8px 15px; background: var(--grad); color: #fff; border: none; border-radius: 8px; font-size: .82rem; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .btn-dl:hover { opacity: .85; }
+    .btn-dl.done { background: linear-gradient(135deg, #11998e, #38ef7d); }
+
+    .single-media { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+    .single-media img, .single-media video { max-width: 480px; width: 100%; border-radius: 16px; border: 1px solid #252525; }
+    .single-media video { max-height: 580px; }
+  </style>
+</head>
+<body>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2>🍪 Настройка куки Instagram</h2>
+    <p>Куки нужны чтобы сервер мог авторизоваться в Instagram. Без них Instagram блокирует запросы.</p>
+    <ul class="steps-mini">
+      <li data-n="1">Открой <strong>instagram.com</strong> в Chrome (войди в аккаунт)</li>
+      <li data-n="2">Нажми <strong>F12</strong> → вкладка <strong>Network</strong></li>
+      <li data-n="3">Обнови страницу (<strong>F5</strong>)</li>
+      <li data-n="4">В списке запросов кликни на любой запрос к <strong>instagram.com</strong></li>
+      <li data-n="5">Справа найди <strong>Request Headers → Cookie</strong></li>
+      <li data-n="6">Скопируй всю строку и вставь сюда:</li>
+    </ul>
+    <textarea id="cookieInput" placeholder="sessionid=...; csrftoken=...; ds_user_id=..."></textarea>
+    <div class="modal-actions">
+      <button class="btn-save" onclick="saveCookie()">Сохранить</button>
+      <button class="btn-cancel" onclick="closeModal()">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="logo">
+    <h1>ZHANDEV SAVER</h1>
+  </div>
+  <p class="tagline">Скачивай фото и видео из Instagram</p>
+
+  <div class="cookie-banner" id="cookieBanner">
+    <span id="cookieStatus">⚠️ Куки не настроены — возможны ошибки</span>
+    <button class="btn-setup" onclick="openModal()" id="cookieBtn">Добавить куки</button>
+  </div>
+
+  <div class="search-wrap">
+    <input type="text" id="urlInput" placeholder="https://www.instagram.com/p/ABC123/"/>
+    <button class="btn-fetch" id="fetchBtn" onclick="fetchMedia()">Скачать</button>
+  </div>
+  <div class="status" id="status"></div>
+</div>
+
+<div class="results" id="results"></div>
+
+<script>
+  const DL_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v10M7 15l5 5 5-5"/><path d="M5 20h14"/></svg>`;
+
+  async function checkCookieStatus() {
+    try {
+      const res = await fetch('/api/status');
+      const data = await res.json();
+      const banner = document.getElementById('cookieBanner');
+      const statusEl = document.getElementById('cookieStatus');
+      const btn = document.getElementById('cookieBtn');
+      if (data.hasCookie) {
+        banner.className = 'cookie-banner ok';
+        statusEl.textContent = '✅ Куки настроены — работаем с авторизацией';
+        btn.textContent = 'Обновить куки';
+      }
+    } catch {}
+  }
+
+  function openModal() { document.getElementById('modalOverlay').className = 'modal-overlay show'; }
+  function closeModal() { document.getElementById('modalOverlay').className = 'modal-overlay'; }
+  document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target.id === 'modalOverlay') closeModal(); });
+
+  async function saveCookie() {
+    const cookie = document.getElementById('cookieInput').value.trim();
+    if (!cookie) return alert('Вставь куки!');
+    const res = await fetch('/api/cookie', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ cookie }) });
+    const data = await res.json();
+    if (data.success) { closeModal(); checkCookieStatus(); }
+    else alert('Ошибка: ' + data.error);
+  }
+
+  function showStatus(msg, type) { const el = document.getElementById('status'); el.textContent = msg; el.className = 'status ' + type; }
+  function hideStatus() { document.getElementById('status').className = 'status'; }
+
+  async function fetchMedia() {
+    const url = document.getElementById('urlInput').value.trim();
+    const btn = document.getElementById('fetchBtn');
+    const results = document.getElementById('results');
+    results.className = 'results'; results.innerHTML = '';
+    if (!url) { showStatus('Вставьте ссылку на пост', 'error'); return; }
+    btn.disabled = true; btn.textContent = 'Загрузка...';
+    showStatus('⏳ Получаем медиафайлы...', 'loading');
+    try {
+      const res = await fetch('/api/fetch', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ url }) });
+      const data = await res.json();
+      if (!data.success) { showStatus('❌ ' + data.error, 'error'); return; }
+      hideStatus();
+      renderResults(data.media, data.shortcode);
+    } catch { showStatus('❌ Ошибка соединения с сервером', 'error'); }
+    finally { btn.disabled = false; btn.textContent = 'Скачать'; }
+  }
+
+  function download(mediaUrl, filename) {
+    const a = document.createElement('a');
+    a.href = `/proxy?url=${encodeURIComponent(mediaUrl)}`;
+    a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
+
+  function renderResults(media, shortcode) {
+    const results = document.getElementById('results');
+    results.innerHTML = '';
+
+    if (media.length === 1) {
+      const item = media[0];
+      const ext = item.type === 'video' ? 'mp4' : 'jpg';
+      const wrap = document.createElement('div');
+      wrap.className = 'single-media';
+      if (item.type === 'video') {
+        const v = document.createElement('video'); v.src = item.url; v.controls = true; wrap.appendChild(v);
+      } else {
+        const img = document.createElement('img'); img.src = `/proxy?url=${encodeURIComponent(item.url)}`; img.alt = 'photo'; wrap.appendChild(img);
+      }
+      const dlBtn = document.createElement('button');
+      dlBtn.className = 'btn-dl';
+      dlBtn.innerHTML = `${DL_ICON} Скачать ${item.type === 'video' ? 'видео' : 'фото'}`;
+      dlBtn.onclick = () => { download(item.url, `instagram_${shortcode}.${ext}`); dlBtn.className = 'btn-dl done'; dlBtn.textContent = '✓ Скачивается...'; setTimeout(() => { dlBtn.className = 'btn-dl'; dlBtn.innerHTML = `${DL_ICON} Скачать`; }, 3000); };
+      wrap.appendChild(dlBtn);
+      results.appendChild(wrap);
+    } else {
+      const header = document.createElement('div'); header.className = 'results-header';
+      const title = document.createElement('span'); title.className = 'results-title'; title.textContent = `Найдено файлов: ${media.length}`;
+      const dlAll = document.createElement('button'); dlAll.className = 'btn-dl-all'; dlAll.innerHTML = `${DL_ICON} Скачать все`;
+      dlAll.onclick = () => media.forEach((item, i) => setTimeout(() => download(item.url, `instagram_${shortcode}_${i+1}.${item.type==='video'?'mp4':'jpg'}`), i * 700));
+      header.appendChild(title); header.appendChild(dlAll); results.appendChild(header);
+
+      const grid = document.createElement('div'); grid.className = 'media-grid';
+      media.forEach((item, i) => {
+        const ext = item.type === 'video' ? 'mp4' : 'jpg';
+        const card = document.createElement('div'); card.className = 'media-card';
+        const thumbWrap = document.createElement('div'); thumbWrap.className = 'media-thumb';
+        if (item.type === 'video') {
+          const v = document.createElement('video'); v.src = item.url; v.muted = true; v.loop = true;
+          v.addEventListener('mouseenter', () => v.play()); v.addEventListener('mouseleave', () => { v.pause(); v.currentTime = 0; });
+          thumbWrap.appendChild(v);
+        } else {
+          const img = document.createElement('img'); img.src = `/proxy?url=${encodeURIComponent(item.thumb || item.url)}`; img.loading = 'lazy'; thumbWrap.appendChild(img);
+        }
+        const badge = document.createElement('span'); badge.className = 'media-badge'; badge.textContent = item.type === 'video' ? '▶ Видео' : '📷 Фото';
+        thumbWrap.appendChild(badge);
+        const footer = document.createElement('div'); footer.className = 'media-footer';
+        const idx = document.createElement('span'); idx.className = 'media-index'; idx.textContent = `${i+1} / ${media.length}`;
+        const dlBtn = document.createElement('button'); dlBtn.className = 'btn-dl'; dlBtn.innerHTML = `${DL_ICON} Скачать`;
+        dlBtn.onclick = () => { download(item.url, `instagram_${shortcode}_${i+1}.${ext}`); dlBtn.className = 'btn-dl done'; dlBtn.textContent = '✓'; setTimeout(() => { dlBtn.className = 'btn-dl'; dlBtn.innerHTML = `${DL_ICON} Скачать`; }, 3000); };
+        footer.appendChild(idx); footer.appendChild(dlBtn);
+        card.appendChild(thumbWrap); card.appendChild(footer); grid.appendChild(card);
+      });
+      results.appendChild(grid);
+    }
+
+    results.className = 'results show';
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  document.getElementById('urlInput').addEventListener('keydown', e => { if (e.key === 'Enter') fetchMedia(); });
+  checkCookieStatus();
+</script>
+</body>
+</html>
